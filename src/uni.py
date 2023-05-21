@@ -8,39 +8,36 @@ import sys
 
 from collections.abc import Iterable
 
-import uc.uni
 import uc.block
 import uc.format
 import uc.search
+import uc.uni
 
 SELF = 'uni'
 error_count = 0
 
 def error(s):
-    global error_count
+    global error_count  # noqa: PLW0603
     error_count += 1
     print(f'{SELF}: {s}', file=sys.stderr)
 
-def unichr_e(value) -> str | None:
+def unichr_e(value: int | str) -> str | None:
     try:
         return uc.uni.unichr(value)
     except ValueError:
-        error(f'No character {repr(value)}')
+        error(f'No character {value!r}')
         return None
 
 def unicode_points(
         blocks: Iterable[uc.block.UniBlock] | None = None) -> Iterable[int]:
-    """Returns a sequence of all Unicode points in the blocks."""
+    """Return a sequence of all Unicode points in the blocks."""
     if blocks:
-        source: Iterable[int] = itertools.chain.from_iterable(
-            (b.range for b in blocks))
-    else:
-        source = range(sys.maxunicode + 1)
-    return source
+        return itertools.chain.from_iterable(b.range for b in blocks)
+    return range(sys.maxunicode + 1)
 
 def unicode_chars(
         blocks: Iterable[uc.block.UniBlock] | None = None) -> Iterable[str]:
-    """Returns a map of all Unicode character names in the blocks."""
+    """Return a map of all Unicode character names in the blocks."""
     return (chr(i) for i in unicode_points(blocks))
 
 CANNED_FORMATS = {
@@ -81,12 +78,13 @@ PROPS = (
     'width',
 )
 
-def main(argv: list[str] | None = None):
+def main(argv: list[str] | None = None) -> int:  # noqa: C901, PLR0912, PLR0915
     if argv is None:
         argv = sys.argv  # pragma: no cover
-    global SELF
+
+    global SELF  # noqa: PLW0603
     SELF = pathlib.Path(argv[0]).stem
-    global error_count
+    global error_count  # noqa: PLW0603
     error_count = 0
 
     parser = argparse.ArgumentParser(prog=SELF)
@@ -179,12 +177,14 @@ def main(argv: list[str] | None = None):
         help='character, name, or search pattern')
     args = parser.parse_args(argv[1 :])
 
+    # Collect character property selections.
     props = []
     for p in PROPS:
         if (pp := getattr(args, p, [])):
             for v in pp:
                 props.append((p, v))
 
+    # Collect unicode block selections.
     blocks = []
     if args.block is not None:
         for b in args.block:
@@ -194,6 +194,7 @@ def main(argv: list[str] | None = None):
                 error(e)
                 return error_count
 
+    # Find matching characters.
     chrs: Iterable[str]
     if args.character:
         if args.search:
@@ -203,7 +204,7 @@ def main(argv: list[str] | None = None):
             cc = (unichr_e(name) for name in args.character)
             chrs = (
                 c for c in cc
-                if c and ((any((c in b for b in blocks)) if blocks else True)))
+                if c and (any(c in b for b in blocks) if blocks else True))
     elif blocks:
         chrs = unicode_chars(blocks)
     elif props:
@@ -212,11 +213,13 @@ def main(argv: list[str] | None = None):
         parser.print_help()
         return 1
 
+    # Limit matching characters by character property selections.
     if props:
         chrs = (
             c for c in chrs if args.fold(
                 str(uc.uni.PROPERTIES[p](c, '')) == v for p, v in props))
 
+    # Report results.
     if not args.format:
         args.format = [CANNED_FORMATS['short'][1]]
     sep = False

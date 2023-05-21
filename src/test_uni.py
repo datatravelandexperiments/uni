@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-"""Test uni command"""
+"""Test uni command."""
 
 import uni
 

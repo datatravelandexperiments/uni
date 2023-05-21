@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-"""Test uc.block"""
+"""Test uc.block."""
 
 import pytest
 
@@ -11,7 +11,7 @@ def test_uniblock_init_code_point():
     assert b.name == 'Latin Extended-A'
 
 def test_uniblock_init_code_point_unassigned():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match='No block'):
         _ = UniBlock(0x43210)
 
 def test_uniblock_init_character():
@@ -20,12 +20,12 @@ def test_uniblock_init_character():
     assert b.name == 'Arrows'
 
 def test_uniblock_init_character_unassigned():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match='No block'):
         _ = UniBlock('\U00042310')
 
 def test_uniblock_init_type_error():
     with pytest.raises(TypeError):
-        _ = UniBlock(UniBlock)
+        _ = UniBlock(UniBlock)  # type:ignore[arg-type]
 
 def test_uniblock_init_name():
     b = UniBlock('ASCII')
@@ -33,7 +33,7 @@ def test_uniblock_init_name():
     assert b.name == 'Basic Latin'
 
 def test_uniblock_init_name_unassigned():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match='Unknown block'):
         _ = UniBlock('This is probably not the name of a Unicode block')
 
 def test_uniblock_contains():

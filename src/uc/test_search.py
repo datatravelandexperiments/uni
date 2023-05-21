@@ -1,7 +1,9 @@
 # SPDX-License-Identifier: MIT
-"""Test code.search"""
+"""Test code.search."""
 
 import sys
+
+from collections.abc import Generator
 
 import pytest
 
@@ -10,7 +12,8 @@ from uc.search import search_name
 # NB. Some of these tests could fail in the future if Unicode adds
 # new characters with unfortunately conflicting names.
 
-def chars(lo: int = 0, hi: int = sys.maxunicode + 1):
+def chars(lo: int = 0,
+          hi: int = sys.maxunicode + 1) -> Generator[str, None, None]:
     return (chr(i) for i in range(lo, hi))
 
 def test_search_name_exact():
@@ -39,5 +42,5 @@ def test_search_name_glob():
     assert list(r) == list('%:;')
 
 def test_search_name_bad():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match='Unknown'):
         _ = search_name('bad', ['c[eo]*n'], chars(0, 0x7F))

@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: MIT
-"""Test code.block"""
+"""Test code.block."""
 
 from typing import Any
 
 import pytest
 
-import uc.uni
 import uc.data.ccc
+import uc.uni
 
 UNICHR_CASES: list[tuple[str, Any]] = [
     ('C', 67),
@@ -16,18 +16,21 @@ UNICHR_CASES: list[tuple[str, Any]] = [
     ('G', 'U+000000047'),
 ]
 
-@pytest.mark.parametrize('c,i', UNICHR_CASES)
+@pytest.mark.parametrize(('c', 'i'), UNICHR_CASES)
 def test_unichr(c, i):
     u = uc.uni.unichr(i)
     assert u == c
 
 def test_unichr_type_error():
     with pytest.raises(TypeError):
-        _ = uc.uni.unichr(Any)
+        _ = uc.uni.unichr(TypeError)  # type: ignore[arg-type]
 
 def test_uni_bidirectional():
     assert uc.uni.bidirectional('B') == 'L'
     assert uc.uni.bidirectional('\u05D0') == 'R'  # HEBREW LETTER ALEF
+
+def test_uni_block():
+    assert uc.uni.block('\u00E5') == 'Latin-1 Supplement'
 
 def test_uni_category():
     assert uc.uni.category('B') == 'Lu'
@@ -46,7 +49,7 @@ def test_uni_decimal():
     assert uc.uni.decimal('\U00002464') is None  # CIRCLED DIGIT FIVE
 
 def test_uni_decomposition():
-    assert uc.uni.decomposition('B') == ''
+    assert not uc.uni.decomposition('B')
     # LATIN SMALL LETTER E WITH ACUTE
     # → LATIN SMALL LETTER E, COMBINING ACUTE ACCENT
     assert uc.uni.decomposition('\u00E9') == '0065 0301'
@@ -57,6 +60,23 @@ def test_uni_digit():
     # MATHEMATICAL DOUBLE-STRUCK DIGIT THREE
     assert uc.uni.digit('\U0001D7DB') == 3
     assert uc.uni.digit('\U00002464') == 5  # CIRCLED DIGIT FIVE
+
+def test_uni_hexadecimal():
+    assert uc.uni.hexadecimal('\u00E2') == '00E2'
+    assert uc.uni.hexadecimal('\U0001D53B') == '1D53B'
+
+def test_uni_identifier():
+    assert (uc.uni.identifier('\U0001D53C') ==
+            'MATHEMATICAL_DOUBLE_STRUCK_CAPITAL_E')
+    assert uc.uni.identifier('\U00101234', 'Default') == 'Default'
+
+def test_uni_east_asian_width():
+    assert uc.uni.east_asian_width('B') == 'Na'
+    assert uc.uni.east_asian_width('\u05D0') == 'N'  # HEBREW LETTER ALEF
+    assert uc.uni.east_asian_width('\u0308') == 'A'  # COMBINING DIAERESIS
+    assert uc.uni.east_asian_width('\u30A6') == 'W'  # KATAKANA LETTER U
+    assert uc.uni.east_asian_width('\uFF21') == 'F'  # FULLWIDTH LATIN CAPITAL A
+    assert uc.uni.east_asian_width('\uFF73') == 'H'  # HALFWIDTH KATAKANA U
 
 def test_uni_mirrored():
     assert uc.uni.mirrored('B') == 0
@@ -106,6 +126,16 @@ def test_uni_numeric():
 
 def test_uni_ordinal():
     assert uc.uni.ordinal('B') == 66
+
+def test_uni_utf8():
+    assert uc.uni.utf8('B') == [66]
+    assert uc.uni.utf8('\u00E0') == [195, 160]
+    assert uc.uni.utf8('\u30A6') == [0xE3, 0x82, 0xA6]
+
+def test_uni_utf16():
+    assert uc.uni.utf16('B') == [66]
+    assert uc.uni.utf16('\U0001D538') == [55349, 56632]
+    assert not uc.uni.utf16('\uD838')
 
 def test_uni_width():
     assert uc.uni.width('B') == 'Na'

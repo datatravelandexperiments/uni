@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-"""Test code.format"""
+"""Test code.format."""
 
 import pytest
 
@@ -66,7 +66,7 @@ FORMAT_CASES: list[tuple[str, str, str]] = [
 ]
 # yapf: enable
 
-@pytest.mark.parametrize('character,key,result', FORMAT_CASES)
+@pytest.mark.parametrize(('character', 'key', 'result'), FORMAT_CASES)
 def test_uni_format_init(character, key, result):
     u = UniFormat(character)
     assert u[key] == result

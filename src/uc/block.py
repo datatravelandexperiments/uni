@@ -8,7 +8,7 @@ class UniBlock:
     def __init__(self, which: int | str):
         self.range, self.name = block(which)
 
-    def __contains__(self, key: str | int):
+    def __contains__(self, key: str | int) -> bool:
         if isinstance(key, str):
             key = ord(key)
         return key in self.range
@@ -25,13 +25,15 @@ def by_name(name: str) -> tuple[range, str]:
         for s in names:
             if name == __sq(s):
                 return (r, names[0])
-    raise ValueError(f'Unknown block "{name}"')
+    message = f'Unknown block "{name}"'
+    raise ValueError(message)
 
 def by_code_point(value: int) -> tuple[range, str]:
     for r, names in uc.data.block.BLOCKS:
         if value in r:
             return (r, names[0])
-    raise ValueError(f'No block contains 0x{value:06X}')
+    message = f'No block contains 0x{value:06X}'
+    raise ValueError(message)
 
 def block(which: int | str) -> tuple[range, str]:
     """Get a block by range, code point, character, or name."""
@@ -46,4 +48,5 @@ def block(which: int | str) -> tuple[range, str]:
         # Block looked up by name.
         return by_name(which)
 
-    raise TypeError(f'{which} does not identify a unicode block')
+    message = f'{which} does not identify a unicode block'
+    raise TypeError(message)
