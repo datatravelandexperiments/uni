@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: MIT
+"""Character conversions and properties."""
 
 import unicodedata
 
@@ -87,7 +88,7 @@ PROPERTIES: dict[str, PropertyAccessFunction] = {}
 
 def register(v: dict) -> Callable:
 
-    def decorator(fn):
+    def decorator(fn: Callable) -> Callable:
         v[fn.__name__] = fn
         return fn
 

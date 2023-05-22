@@ -1,11 +1,12 @@
 # SPDX-License-Identifier: MIT
+"""Unicode blocks."""
 
 import uc.data.block
 
 class UniBlock:
     """Representation of a Unicode block (or any contiguous character range)."""
 
-    def __init__(self, which: int | str):
+    def __init__(self, which: int | str) -> None:
         self.range, self.name = block(which)
 
     def __contains__(self, key: str | int) -> bool:
@@ -13,10 +14,10 @@ class UniBlock:
             key = ord(key)
         return key in self.range
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'UniBlock({repr(self.rnge)},{repr(self.name)})'
 
-def __sq(s):
+def __sq(s: str) -> str:
     return ''.join([c.lower() for c in s if c.isalnum()])
 
 def by_name(name: str) -> tuple[range, str]:

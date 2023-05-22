@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: MIT
+"""Formatting."""
 
 from collections.abc import Iterable
 
@@ -15,7 +16,7 @@ class UniFormat:
         'x': 'hexadecimal',
     }
 
-    def __init__(self, c: str, eol: str = '\n'):
+    def __init__(self, c: str, eol: str = '\n') -> None:
         self.c = c
         self.v = ord(c)
         self.eol = eol

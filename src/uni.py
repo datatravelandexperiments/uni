@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # SPDX-License-Identifier: MIT
+"""`uni` command."""
 
 import argparse
 import itertools
@@ -16,7 +17,7 @@ import uc.uni
 SELF = 'uni'
 error_count = 0
 
-def error(s):
+def error(s: str) -> None:
     global error_count  # noqa: PLW0603
     error_count += 1
     print(f'{SELF}: {s}', file=sys.stderr)

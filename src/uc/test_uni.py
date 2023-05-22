@@ -105,14 +105,14 @@ def test_uni_nfkc():
 def test_uni_nfd():
     assert uc.uni.nfd('B') == 'B'
     assert uc.uni.normalize('B', 'nfd') == 'B'
-    # LATIN CAPITAL LETTER A WITH GRAVE → A, COMBINING GRAVE ACCENT
+    # LATIN CAPITAL LETTER A WITH GRAVE → A, COMBINING GRAVE ACCENT
     assert uc.uni.nfd('\u00C0') == 'A\u0300'
     assert uc.uni.normalize('\u00C0', 'nfd') == 'A\u0300'
 
 def test_uni_nfkd():
     assert uc.uni.nfkd('B') == 'B'
     assert uc.uni.normalize('B', 'nfkd') == 'B'
-    # LATIN CAPITAL LETTER DZ WITH CARON → D, Z, COMBINING CARON
+    # LATIN CAPITAL LETTER DZ WITH CARON → D, Z, COMBINING CARON
     assert uc.uni.nfkd('\u01C4') == 'DZ\u030C'
     assert uc.uni.normalize('\u01C4', 'nfkd') == 'DZ\u030C'
 
