@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "unicode-name-inquiry"
-version = "1.9.2"
+version = "1.9.3"
 description = "Command-line tool to display Unicode character information"
 license.text = "MIT License"
 readme = "README.md"
@@ -123,6 +123,9 @@ lines-between-types = 1
 "test_*.py" = [
     "ANN001", "ANN201",  # test typing tbd
     "S101",     # assert
+]
+"html_entities.py" = [
+    "RUF001"
 ]
 
 [tool.yapf]

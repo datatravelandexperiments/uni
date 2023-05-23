@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-"""Test code.block."""
+"""Test uc.uni."""
 
 from typing import Any
 
@@ -64,6 +64,10 @@ def test_uni_digit():
 def test_uni_hexadecimal():
     assert uc.uni.hexadecimal('\u00E2') == '00E2'
     assert uc.uni.hexadecimal('\U0001D53B') == '1D53B'
+
+def test_uni_html():
+    assert uc.uni.html('B') == '&#0042;'
+    assert uc.uni.html('\u00FE') == '&thorn;'
 
 def test_uni_identifier():
     assert (uc.uni.identifier('\U0001D53C') ==

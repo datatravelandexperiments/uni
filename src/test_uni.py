@@ -25,6 +25,15 @@ def test_character_name(capsys):
     assert status == 0
     assert capsys.readouterr().out == 'a U+0061 LATIN SMALL LETTER A\n'
 
+def test_character_string(capsys):
+    status = uni.main(['uni', '--string', 'comma'])
+    assert status == 0
+    assert capsys.readouterr().out == ('c U+0063 LATIN SMALL LETTER C\n'
+                                       'o U+006F LATIN SMALL LETTER O\n'
+                                       'm U+006D LATIN SMALL LETTER M\n'
+                                       'm U+006D LATIN SMALL LETTER M\n'
+                                       'a U+0061 LATIN SMALL LETTER A\n')
+
 def test_block(capsys):
     status = uni.main(['uni', '--block', 'ASCII', '--char', '-n'])
     assert status == 0

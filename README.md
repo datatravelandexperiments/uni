@@ -32,10 +32,22 @@ character names.
 The _character_ arguments are shell-style patterns, matched against character
 names.
 
+#### `--html`, `-H`
+
+The _character_ arguments are HTML entity names.
+Surrounding the name with `&` and `;` is optional.
+
 #### `--match`, `-m`
 
 The _character_ arguments are text that can match anywhere in a character
 name.
+
+#### `--string`, `-S`
+
+The _character_ arguments are treated as sequences of individual characters.
+For example, if the argument is `tilde`, instead of reporting the single
+character `~`, the result will be the five characters `t`, `i`, `l`, `d`,
+and `e`.
 
 #### `--word`, `-w`
 
@@ -95,7 +107,8 @@ The keywords are:
 - `{decomposition}` - the character's decomposition.
 - `{digit}` - the character's digit value.
 - `{eol}` - the end-of-line character (newline unless changed by command-line options).
-- `{id}` - the character name with blanks and hyphends replaced by ‘`_`’.
+- `{html}` - the HTML entity name for the character.
+- `{id}` - the character name with blanks and hyphends replaced by `_`.
 - `{mirrored}` - whether the character is mirrored in bidirectional text.
 - `{name}` - the character's name.
 - `{nfc}` - the NFC normalization form, as character names.

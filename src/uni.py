@@ -63,9 +63,12 @@ CANNED_FORMATS = {
               'NFD        {NFD:16} {nfd}{eol}'
               'NFKD       {NFKD:16} {nfkd}{eol}'
               'UTF-8      {UTF8!s:16} {utf8}{eol}'
-              'UTF-16     {UTF16!s:16} {utf16}{eol}')),
+              'UTF-16     {UTF16!s:16} {utf16}{eol}'
+              'HTML       {html}'
+              )),
     'compose': ('print for XCompose', ': "{char}"   U{x} # {name}'),
 }
+CANNED_FORMATS['full'] = CANNED_FORMATS['long']
 
 PROPS = (
     'bidi',
@@ -89,7 +92,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901, PLR0912, PLR0915
     error_count = 0
 
     parser = argparse.ArgumentParser(prog=SELF)
-    search_group = parser.add_argument_group('search options')
+    search_group = parser.add_argument_group('lookup options')
     anyall = search_group.add_mutually_exclusive_group()
     anyall.add_argument(
         '--all',
@@ -122,6 +125,13 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901, PLR0912, PLR0915
         dest='search',
         const='glob')
     search.add_argument(
+        '--html',
+        '-H',
+        help='look up HTML entities',
+        action='store_const',
+        dest='search',
+        const='html')
+    search.add_argument(
         '--match',
         '-m',
         help='search names using text anywhere',
@@ -135,6 +145,13 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901, PLR0912, PLR0915
         action='store_const',
         dest='search',
         const='word')
+    search.add_argument(
+        '--string',
+        '-S',
+        help='treat arguments as sequences of individual characters',
+        action='store_const',
+        dest='search',
+        const='string')
 
     prop_group = parser.add_argument_group('property match options')
     prop_group.add_argument(
@@ -198,11 +215,16 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901, PLR0912, PLR0915
     # Find matching characters.
     chrs: Iterable[str]
     if args.character:
-        if args.search:
+        if args.search and args.search != 'string':
             chrs = uc.search.search_name(args.search, args.character,
                                          unicode_chars(blocks), args.fold)
         else:
-            cc = (unichr_e(name) for name in args.character)
+            if args.search == 'string':
+                cc = []
+                for name in args.character:
+                    cc += name
+            else:
+                cc = (unichr_e(name) for name in args.character)
             chrs = (
                 c for c in cc
                 if c and (any(c in b for b in blocks) if blocks else True))

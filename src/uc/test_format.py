@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-"""Test code.format."""
+"""Test uc.format."""
 
 import pytest
 
@@ -63,6 +63,8 @@ FORMAT_CASES: list[tuple[str, str, str]] = [
     ('\u01C4',      'NFKD',             'DZ\u030C'),
     ('\u01C4',      'nfkd',
      'LATIN CAPITAL LETTER D, LATIN CAPITAL LETTER Z, COMBINING CARON'),
+    ('B',           'html',             '&#0042;'),
+    ('\u00FE',      'html',             '&thorn;'),
 ]
 # yapf: enable
 

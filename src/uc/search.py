@@ -8,6 +8,7 @@ import unicodedata
 from collections.abc import Callable, Iterable
 from typing import Any
 
+import uc.html
 import uc.uni
 
 # Name searches.
@@ -59,12 +60,22 @@ def search_glob(select: Iterable[str],
                 fold: Fold = all) -> Iterable[str]:
     return search_egrep((fnmatch.translate(x) for x in select), source, fold)
 
+def search_html(select: Iterable[str],
+                source: Iterable[str],
+                _fold: Fold = all) -> Iterable[str]:
+    r: list[str] = []
+    for s in select:
+        if (ec := uc.html.entity_to_characters(s)):
+            r += ec
+    return (c for c in source if c in r)
+
 __NAME_SEARCH = {
     'exact': search_exact,
     'match': search_match,
     'word': search_word,
     'egrep': search_egrep,
     'glob': search_glob,
+    'html': search_html,
 }
 
 def search_name(mode: str,
