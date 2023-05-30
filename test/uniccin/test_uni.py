@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT
 """Test uni command."""
 
-import uni
+from uniccin import uni
 
 def test_no_args(capsys):
     status = uni.main(['uni'])

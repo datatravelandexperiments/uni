@@ -3,7 +3,7 @@
 
 import pytest
 
-from uc.format import UniFormat
+from uniccin.format import UniFormat
 
 # yapf: disable
 FORMAT_CASES: list[tuple[str, str, str]] = [

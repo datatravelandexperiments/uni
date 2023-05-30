@@ -42,7 +42,7 @@ def main(argv: list[str] | None = None) -> int:
         '--output',
         '-o',
         metavar='FILE',
-        default='src/uc/data/html_entities.py',
+        default='src/uniccin/data/html_entities.py',
         help='Output file.')
     args = parser.parse_args(argv[1 :])
 

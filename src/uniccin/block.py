@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT
 """Unicode blocks."""
 
-import uc.data.block
+from uniccin.data.block import BLOCKS
 
 class UniBlock:
     """Representation of a Unicode block (or any contiguous character range)."""
@@ -22,7 +22,7 @@ def __sq(s: str) -> str:
 
 def by_name(name: str) -> tuple[range, str]:
     name = __sq(name)
-    for r, names in uc.data.block.BLOCKS:
+    for r, names in BLOCKS:
         for s in names:
             if name == __sq(s):
                 return (r, names[0])
@@ -30,7 +30,7 @@ def by_name(name: str) -> tuple[range, str]:
     raise ValueError(message)
 
 def by_code_point(value: int) -> tuple[range, str]:
-    for r, names in uc.data.block.BLOCKS:
+    for r, names in BLOCKS:
         if value in r:
             return (r, names[0])
     message = f'No block contains 0x{value:06X}'

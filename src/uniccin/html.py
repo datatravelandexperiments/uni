@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT
 """HTML entities."""
 
-from uc.data.html_entities import HTML_ENTITY, OTHER
+from uniccin.data.html_entities import HTML_ENTITY, OTHER
 
 __REVERSE = {}
 

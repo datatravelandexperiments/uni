@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-"""Test uc.search."""
+"""Test uniccin.search."""
 
 import sys
 
@@ -7,7 +7,7 @@ from collections.abc import Generator
 
 import pytest
 
-from uc.search import search_name
+from uniccin.search import search_name
 
 # NB. Some of these tests could fail in the future if Unicode adds
 # new characters with unfortunately conflicting names.

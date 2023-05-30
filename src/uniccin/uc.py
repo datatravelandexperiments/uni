@@ -6,8 +6,8 @@ import unicodedata
 from collections.abc import Callable, Sequence
 from typing import Any, TypeVar
 
-import uc.block
-import uc.html
+import uniccin.block
+import uniccin.html
 
 T = TypeVar('T')
 
@@ -101,7 +101,7 @@ def bidirectional(c: str, _=None) -> str:
 
 @register(PROPERTIES)
 def block(c: str, _=None) -> str:
-    return uc.block.block(ord(c))[1]
+    return uniccin.block.block(ord(c))[1]
 
 @register(PROPERTIES)
 def category(c: str, _=None) -> str:
@@ -137,7 +137,7 @@ def hexadecimal(c: str, _=None, digits: int = 4) -> str:
 
 @register(PROPERTIES)
 def html(c: str, _=None) -> str:
-    return uc.html.character_to_entity(c)
+    return uniccin.html.character_to_entity(c)
 
 @register(PROPERTIES)
 def identifier(c: str, default: T | None = None) -> str | T | None:

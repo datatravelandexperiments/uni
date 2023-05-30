@@ -3,8 +3,8 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "unicode-name-inquiry"
-version = "1.9.3"
+name = "uniccin"
+version = "1.9.4"
 description = "Command-line tool to display Unicode character information"
 license.text = "MIT License"
 readme = "README.md"
@@ -24,7 +24,7 @@ classifiers = [
 ]
 
 [project.scripts]
-uni = "uni:main"
+uni = "uniccin.uni:main"
 
 [project.urls]
 repository = "https://codeberg.org/datatravelandexperiments/uni"

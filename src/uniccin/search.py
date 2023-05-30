@@ -8,8 +8,8 @@ import unicodedata
 from collections.abc import Callable, Iterable
 from typing import Any
 
-import uc.html
-import uc.uni
+from uniccin.html import entity_to_characters
+from uniccin.uc import unichr
 
 # Name searches.
 
@@ -27,7 +27,7 @@ def search_exact(select: Iterable[str],
             c = s
         else:
             try:
-                c = uc.uni.unichr(s)
+                c = unichr(s)
             except ValueError:
                 continue
         if c in source:
@@ -65,7 +65,7 @@ def search_html(select: Iterable[str],
                 _fold: Fold = all) -> Iterable[str]:
     r: list[str] = []
     for s in select:
-        if (ec := uc.html.entity_to_characters(s)):
+        if (ec := entity_to_characters(s)):
             r += ec
     return (c for c in source if c in r)
 

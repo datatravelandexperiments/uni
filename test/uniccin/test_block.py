@@ -3,7 +3,7 @@
 
 import pytest
 
-from uc.block import UniBlock
+from uniccin.block import UniBlock
 
 def test_uniblock_init_code_point():
     b = UniBlock(0x0123)

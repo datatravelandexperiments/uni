@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # SPDX-License-Identifier: MIT
 """`uni` command."""
 
@@ -7,12 +6,12 @@ import itertools
 import pathlib
 import sys
 
-from collections.abc import Iterable
+from collections.abc import Generator, Iterable
 
-import uc.block
-import uc.format
-import uc.search
-import uc.uni
+import uniccin.block
+import uniccin.format
+import uniccin.search
+import uniccin.uc
 
 SELF = 'uni'
 error_count = 0
@@ -24,20 +23,22 @@ def error(s: str) -> None:
 
 def unichr_e(value: int | str) -> str | None:
     try:
-        return uc.uni.unichr(value)
+        return uniccin.uc.unichr(value)
     except ValueError:
         error(f'No character {value!r}')
         return None
 
 def unicode_points(
-        blocks: Iterable[uc.block.UniBlock] | None = None) -> Iterable[int]:
+        blocks: Iterable[uniccin.block.UniBlock] | None = None
+) -> Iterable[int]:
     """Return a sequence of all Unicode points in the blocks."""
     if blocks:
         return itertools.chain.from_iterable(b.range for b in blocks)
     return range(sys.maxunicode + 1)
 
 def unicode_chars(
-        blocks: Iterable[uc.block.UniBlock] | None = None) -> Iterable[str]:
+        blocks: Iterable[uniccin.block.UniBlock] | None = None
+) -> Iterable[str]:
     """Return a map of all Unicode character names in the blocks."""
     return (chr(i) for i in unicode_points(blocks))
 
@@ -64,8 +65,7 @@ CANNED_FORMATS = {
               'NFKD       {NFKD:16} {nfkd}{eol}'
               'UTF-8      {UTF8!s:16} {utf8}{eol}'
               'UTF-16     {UTF16!s:16} {utf16}{eol}'
-              'HTML       {html}'
-              )),
+              'HTML       {html}')),
     'compose': ('print for XCompose', ': "{char}"   U{x} # {name}'),
 }
 CANNED_FORMATS['full'] = CANNED_FORMATS['long']
@@ -207,18 +207,19 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901, PLR0912, PLR0915
     if args.block is not None:
         for b in args.block:
             try:
-                blocks.append(uc.block.UniBlock(b))
+                blocks.append(uniccin.block.UniBlock(b))
             except ValueError as e:
-                error(e)
+                error(str(e))
                 return error_count
 
     # Find matching characters.
     chrs: Iterable[str]
     if args.character:
         if args.search and args.search != 'string':
-            chrs = uc.search.search_name(args.search, args.character,
-                                         unicode_chars(blocks), args.fold)
+            chrs = uniccin.search.search_name(args.search, args.character,
+                                              unicode_chars(blocks), args.fold)
         else:
+            cc: list[str] | Generator[str | None, None, None]
             if args.search == 'string':
                 cc = []
                 for name in args.character:
@@ -240,7 +241,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901, PLR0912, PLR0915
     if props:
         chrs = (
             c for c in chrs if args.fold(
-                str(uc.uni.PROPERTIES[p](c, '')) == v for p, v in props))
+                str(uniccin.uc.PROPERTIES[p](c, '')) == v for p, v in props))
 
     # Report results.
     if not args.format:
@@ -251,7 +252,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901, PLR0912, PLR0915
             print(end=args.eol)
         sep = True
         for f in args.format:
-            print(f.format_map(uc.format.UniFormat(c)), end='')
+            print(f.format_map(uniccin.format.UniFormat(c)), end='')
 
     if args.eol and args.eol != chr(0):
         print(end=args.eol)
