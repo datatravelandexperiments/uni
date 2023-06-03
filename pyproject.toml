@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "uniccin"
-version = "1.9.4"
+version = "1.9.5"
 description = "Command-line tool to display Unicode character information"
 license.text = "MIT License"
 readme = "README.md"

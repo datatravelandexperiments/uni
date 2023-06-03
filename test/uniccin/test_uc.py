@@ -25,6 +25,18 @@ def test_unichr_type_error():
     with pytest.raises(TypeError):
         _ = uniccin.uc.unichr(TypeError)  # type: ignore[arg-type]
 
+def test_sanitize_clean():
+    s = 'We are happy.'
+    assert uniccin.uc.sanitize(s) == s
+
+def test_sanitize_dirty_replace():
+    s = 'We are \uDCBA happy.'
+    assert uniccin.uc.sanitize(s) == 'We are \uFFFD happy.'
+
+def test_sanitize_dirty_remove():
+    s = 'We are \uDCBA happy.'
+    assert uniccin.uc.sanitize(s, None) == 'We are  happy.'
+
 def test_uni_bidirectional():
     assert uniccin.uc.bidirectional('B') == 'L'
     assert uniccin.uc.bidirectional('\u05D0') == 'R'  # HEBREW LETTER ALEF

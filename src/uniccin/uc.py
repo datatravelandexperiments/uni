@@ -74,6 +74,21 @@ def utf32to8(n: int) -> Sequence[int]:
     r.reverse()
     return r
 
+def sanitize(s: str, replacement: str | None = '\uFFFD') -> str:
+    """Remove or replace disallowed code points (surrogates)."""
+    try:
+        _ = bytes(s, encoding='utf-32')
+    except UnicodeEncodeError:
+        r = []
+        for c in s:
+            if ord(c) in range(0xD800, 0xE000):
+                if replacement is not None:
+                    r.append(replacement)
+            else:
+                r.append(c)
+        s = ''.join(r)
+    return s
+
 # Normalization
 
 def normalize(c: str, form: str) -> str:

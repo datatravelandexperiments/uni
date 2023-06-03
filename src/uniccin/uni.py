@@ -252,7 +252,9 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901, PLR0912, PLR0915
             print(end=args.eol)
         sep = True
         for f in args.format:
-            print(f.format_map(uniccin.format.UniFormat(c)), end='')
+            print(
+                uniccin.uc.sanitize(f.format_map(uniccin.format.UniFormat(c))),
+                end='')
 
     if args.eol and args.eol != chr(0):
         print(end=args.eol)
