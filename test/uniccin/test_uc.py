@@ -144,6 +144,13 @@ def test_uni_numeric():
 def test_uni_ordinal():
     assert uniccin.uc.ordinal('B') == 66
 
+def test_uni_usv():
+    assert uniccin.uc.usv('B') == 'B'
+    assert uniccin.uc.usv('\uD7FF') == '\uD7FF'
+    assert uniccin.uc.usv('\uE000') == '\uE000'
+    assert uniccin.uc.usv('\uDFFF', '\uFFFD') == '\uFFFD'
+    assert not uniccin.uc.usv('\uD800')
+
 def test_uni_utf8():
     assert uniccin.uc.utf8('B') == [66]
     assert uniccin.uc.utf8('\u00E0') == [195, 160]

@@ -81,11 +81,8 @@ def sanitize(s: str, replacement: str | None = '\uFFFD') -> str:
     except UnicodeEncodeError:
         r = []
         for c in s:
-            if ord(c) in range(0xD800, 0xE000):
-                if replacement is not None:
-                    r.append(replacement)
-            else:
-                r.append(c)
+            if (ch := usv(c, replacement)) is not None:
+                r.append(ch)
         s = ''.join(r)
     return s
 
@@ -201,6 +198,13 @@ def ordinal(c: str, _=None) -> int:
 @register(PROPERTIES)
 def u(c: str, _=None, digits: int = 4) -> str:
     return f'U+{ord(c):0{digits}X}'
+
+@register(PROPERTIES)
+def usv(c: str, replacement: T | None = None) -> str | T | None:
+    """Unicode Scalar Value."""
+    if ord(c) in range(0xD800, 0xE000):
+        return replacement
+    return c
 
 @register(PROPERTIES)
 def utf8(c: str, _=None) -> Sequence[int]:
