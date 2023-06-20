@@ -16,6 +16,19 @@ UNICHR_CASES: list[tuple[str, Any]] = [
     ('G', 'U+000000047'),
 ]
 
+def test_from_character():
+    c = uniccin.uc.from_character('C')
+    assert c == uniccin.uc.UniCode('C')
+    assert uniccin.uc.char(c) == 'C'
+
+def test_from_bad_character():
+    with pytest.raises(ValueError, match='not a character'):
+        _ = uniccin.uc.from_character('Crap')
+
+def test_from_integer():
+    c = uniccin.uc.from_integer(66)
+    assert c == uniccin.uc.UniCode(chr(66))
+
 @pytest.mark.parametrize(('c', 'i'), UNICHR_CASES)
 def test_unichr(c, i):
     u = uniccin.uc.unichr(i)

@@ -16,7 +16,7 @@ class UniFormat:
         'x': 'hexadecimal',
     }
 
-    def __init__(self, c: str, eol: str = '\n') -> None:
+    def __init__(self, c: uniccin.uc.UniCode, eol: str = '\n') -> None:
         self.c = c
         self.v = ord(c)
         self.eol = eol
@@ -36,7 +36,7 @@ class UniFormat:
         if k in ('nfc', 'nfkc', 'nfd', 'nfkd'):
             v = uniccin.uc.normalize(self.c, k)
             return v if key.isupper() else ', '.join(
-                uniccin.uc.name(c, '?') for c in v)
+                uniccin.uc.name(uniccin.uc.UniCode(c), '?') for c in v)
         if key == 'eol':
             return self.eol
         if k in uniccin.uc.PROPERTIES:

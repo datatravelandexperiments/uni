@@ -9,7 +9,7 @@ from collections.abc import Callable, Iterable
 from typing import Any
 
 from uniccin.html import entity_to_characters
-from uniccin.uc import unichr
+from uniccin.uc import UniCode, unichr
 
 # Name searches.
 
@@ -20,11 +20,11 @@ Fold = Callable[[Iterable[Any]], bool]
 
 def search_exact(select: Iterable[str],
                  source: Iterable[str],
-                 _fold: Fold = all) -> Iterable[str]:
+                 _fold: Fold = all) -> Iterable[UniCode]:
     r = []
     for s in select:
         if len(s) == 1:
-            c = s
+            c = UniCode(s)
         else:
             try:
                 c = unichr(s)
@@ -36,38 +36,38 @@ def search_exact(select: Iterable[str],
 
 def search_match(select: Iterable[str],
                  source: Iterable[str],
-                 fold: Fold = all) -> Iterable[str]:
+                 fold: Fold = all) -> Iterable[UniCode]:
     search = [s.upper() for s in select]
-    return (c for c in source if fold(
+    return (UniCode(c) for c in source if fold(
         x in unicodedata.name(c, '') for x in search))
 
 def search_word(select: Iterable[str],
                 source: Iterable[str],
-                fold: Fold = all) -> Iterable[str]:
+                fold: Fold = all) -> Iterable[UniCode]:
     search = [s.upper() for s in select]
-    return (c for c in source if fold(
+    return (UniCode(c) for c in source if fold(
         x in unicodedata.name(c, '').split() for x in search))
 
 def search_egrep(select: Iterable[str],
                  source: Iterable[str],
-                 fold: Fold = all) -> Iterable[str]:
+                 fold: Fold = all) -> Iterable[UniCode]:
     search = [re.compile(x, re.IGNORECASE) for x in select]
-    return (c for c in source if fold(
+    return (UniCode(c) for c in source if fold(
         x.search(unicodedata.name(c, '')) for x in search))
 
 def search_glob(select: Iterable[str],
                 source: Iterable[str],
-                fold: Fold = all) -> Iterable[str]:
+                fold: Fold = all) -> Iterable[UniCode]:
     return search_egrep((fnmatch.translate(x) for x in select), source, fold)
 
 def search_html(select: Iterable[str],
                 source: Iterable[str],
-                _fold: Fold = all) -> Iterable[str]:
+                _fold: Fold = all) -> Iterable[UniCode]:
     r: list[str] = []
     for s in select:
         if (ec := entity_to_characters(s)):
             r += ec
-    return (c for c in source if c in r)
+    return (UniCode(c) for c in source if c in r)
 
 __NAME_SEARCH = {
     'exact': search_exact,
@@ -81,7 +81,7 @@ __NAME_SEARCH = {
 def search_name(mode: str,
                 select: Iterable[str],
                 source: Iterable[str],
-                fold: Fold = all) -> Iterable[str]:
+                fold: Fold = all) -> Iterable[UniCode]:
     if mode in __NAME_SEARCH:
         return __NAME_SEARCH[mode](select, source, fold)
     message = f'Unknown mode ‘{mode}’'

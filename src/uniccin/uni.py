@@ -11,7 +11,8 @@ from collections.abc import Generator, Iterable
 import uniccin.block
 import uniccin.format
 import uniccin.search
-import uniccin.uc
+
+from uniccin.uc import PROPERTIES, UniCode, sanitize, unichr
 
 SELF = 'uni'
 error_count = 0
@@ -21,15 +22,15 @@ def error(s: str) -> None:
     error_count += 1
     print(f'{SELF}: {s}', file=sys.stderr)
 
-def unichr_e(value: int | str) -> str | None:
+def unichr_e(value: int | str) -> UniCode | None:
     try:
-        return uniccin.uc.unichr(value)
+        return unichr(value)
     except ValueError:
         error(f'No character {value!r}')
         return None
 
 def unicode_points(
-        blocks: Iterable[uniccin.block.UniBlock] | None = None
+        blocks: Iterable[uniccin.block.UniBlock] | None = None,
 ) -> Iterable[int]:
     """Return a sequence of all Unicode points in the blocks."""
     if blocks:
@@ -37,10 +38,10 @@ def unicode_points(
     return range(sys.maxunicode + 1)
 
 def unicode_chars(
-        blocks: Iterable[uniccin.block.UniBlock] | None = None
-) -> Iterable[str]:
+        blocks: Iterable[uniccin.block.UniBlock] | None = None,
+) -> Iterable[UniCode]:
     """Return a map of all Unicode character names in the blocks."""
-    return (chr(i) for i in unicode_points(blocks))
+    return (UniCode(chr(i)) for i in unicode_points(blocks))
 
 CANNED_FORMATS = {
     'char': ('print the character', '{char}'),
@@ -213,17 +214,15 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901, PLR0912, PLR0915
                 return error_count
 
     # Find matching characters.
-    chrs: Iterable[str]
+    chrs: Iterable[UniCode]
     if args.character:
         if args.search and args.search != 'string':
             chrs = uniccin.search.search_name(args.search, args.character,
                                               unicode_chars(blocks), args.fold)
         else:
-            cc: list[str] | Generator[str | None, None, None]
+            cc: list[UniCode] | Generator[UniCode | None, None, None]
             if args.search == 'string':
-                cc = []
-                for name in args.character:
-                    cc += name
+                cc = (UniCode(c) for s in args.character for c in s)
             else:
                 cc = (unichr_e(name) for name in args.character)
             chrs = (
@@ -241,7 +240,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901, PLR0912, PLR0915
     if props:
         chrs = (
             c for c in chrs if args.fold(
-                str(uniccin.uc.PROPERTIES[p](c, '')) == v for p, v in props))
+                str(PROPERTIES[p](c, '')) == v for p, v in props))
 
     # Report results.
     if not args.format:
@@ -253,7 +252,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901, PLR0912, PLR0915
         sep = True
         for f in args.format:
             print(
-                uniccin.uc.sanitize(f.format_map(uniccin.format.UniFormat(c))),
+                sanitize(f.format_map(uniccin.format.UniFormat(c))),
                 end='')
 
     if args.eol and args.eol != chr(0):

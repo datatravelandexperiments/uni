@@ -4,19 +4,30 @@
 import unicodedata
 
 from collections.abc import Callable, Sequence
-from typing import Any, TypeVar
+from typing import Any, NewType, TypeVar
 
 import uniccin.block
 import uniccin.html
+
+UniCode = NewType('UniCode', str)
 
 T = TypeVar('T')
 
 # Conversion
 
-def unichr(value: int | str) -> str:
-    """Convert an integer, character, or Unicode name to character."""
+def from_character(c: str) -> UniCode:
+    if isinstance(c, str) and len(c) == 1:
+        return UniCode(c)
+    message = '{c!r} is not a character'
+    raise ValueError(message)
+
+def from_integer(c: int) -> UniCode:
+    return UniCode(chr(c))
+
+def unichr(value: int | str) -> UniCode:
+    """Convert an integer, character, or Unicode name to UniCode."""
     if isinstance(value, int):
-        return chr(value)
+        return UniCode(chr(value))
 
     if not isinstance(value, str):
         message = f'{value} is not str or int'
@@ -24,17 +35,17 @@ def unichr(value: int | str) -> str:
 
     # Now we have a str.
     if len(value) == 1:
-        return value
+        return UniCode(value)
 
     # Check for a string that represents an integer.
     try:
-        return chr(int(value, 0))
+        return UniCode(chr(int(value, 0)))
     except ValueError:
         pass
 
     # Check for a Unicode character name.
     try:
-        return unicodedata.lookup(value)
+        return UniCode(unicodedata.lookup(value))
     except KeyError:
         pass
 
@@ -44,7 +55,7 @@ def unichr(value: int | str) -> str:
         if i[0] == '+':
             i = i[1 :]
         # Let this raise ValueError.
-        return chr(int(i, 16))
+        return UniCode(chr(int(i, 16)))
 
     message = f'No character {value!r}'
     raise ValueError(message)
@@ -81,7 +92,7 @@ def sanitize(s: str, replacement: str | None = '\uFFFD') -> str:
     except UnicodeEncodeError:
         r = []
         for c in s:
-            if (ch := usv(c, replacement)) is not None:
+            if ch := usv(UniCode(c), replacement):
                 r.append(ch)
         s = ''.join(r)
     return s
@@ -95,7 +106,7 @@ def normalize(c: str, form: str) -> str:
 # Uniform property access functions. These all accept a ‘default’ argument,
 # even though in many cases it is not used.
 
-PropertyAccessFunction = Callable[[str, Any | None], Any]
+PropertyAccessFunction = Callable[[UniCode, Any | None], Any]
 
 PROPERTIES: dict[str, PropertyAccessFunction] = {}
 
@@ -108,62 +119,62 @@ def register(v: dict) -> Callable:
     return decorator
 
 @register(PROPERTIES)
-def bidirectional(c: str, _=None) -> str:
+def bidirectional(c: UniCode, _=None) -> str:
     return unicodedata.bidirectional(c)
 
 @register(PROPERTIES)
-def block(c: str, _=None) -> str:
+def block(c: UniCode, _=None) -> str:
     return uniccin.block.block(ord(c))[1]
 
 @register(PROPERTIES)
-def category(c: str, _=None) -> str:
+def category(c: UniCode, _=None) -> str:
     return unicodedata.category(c)
 
 @register(PROPERTIES)
-def char(c: str, _=None) -> str:
+def char(c: UniCode, _=None) -> str:
     return c
 
 @register(PROPERTIES)
-def combining(c: str, _=None) -> int:
+def combining(c: UniCode, _=None) -> int:
     return unicodedata.combining(c)
 
 @register(PROPERTIES)
-def decimal(c: str, default: T | None = None) -> int | T | None:
+def decimal(c: UniCode, default: int | None = None) -> int | None:
     return unicodedata.decimal(c, default)
 
 @register(PROPERTIES)
-def decomposition(c: str, _=None) -> str:
+def decomposition(c: UniCode, _=None) -> str:
     return unicodedata.decomposition(c)
 
 @register(PROPERTIES)
-def digit(c: str, default: T | None = None) -> int | T | None:
+def digit(c: UniCode, default: int | None = None) -> int | None:
     return unicodedata.digit(c, default)
 
 @register(PROPERTIES)
-def east_asian_width(c: str, _=None) -> str:
+def east_asian_width(c: UniCode, _=None) -> str:
     return width(c)
 
 @register(PROPERTIES)
-def hexadecimal(c: str, _=None, digits: int = 4) -> str:
+def hexadecimal(c: UniCode, _=None, digits: int = 4) -> str:
     return f'{ord(c):0{digits}X}'
 
 @register(PROPERTIES)
-def html(c: str, _=None) -> str:
+def html(c: UniCode, _=None) -> str:
     return uniccin.html.character_to_entity(c)
 
 @register(PROPERTIES)
-def identifier(c: str, default: T | None = None) -> str | T | None:
+def identifier(c: UniCode, default: str | None = None) -> str | None:
     try:
         return unicodedata.name(c).replace(' ', '_').replace('-', '_')
     except ValueError:
         return default
 
 @register(PROPERTIES)
-def mirrored(c: str, _=None) -> int:
+def mirrored(c: UniCode, _=None) -> int:
     return unicodedata.mirrored(c)
 
 @register(PROPERTIES)
-def name(c: str, default: T | None = None) -> str | T:
+def name(c: UniCode, default: str | None = None) -> str:
     try:
         return unicodedata.name(c)
     except ValueError:
@@ -172,48 +183,48 @@ def name(c: str, default: T | None = None) -> str | T:
         return f'U+{ord(c):04X}'
 
 @register(PROPERTIES)
-def nfc(c: str, _=None) -> str:
+def nfc(c: UniCode, _=None) -> str:
     return unicodedata.normalize('NFC', c)
 
 @register(PROPERTIES)
-def nfkc(c: str, _=None) -> str:
+def nfkc(c: UniCode, _=None) -> str:
     return unicodedata.normalize('NFKC', c)
 
 @register(PROPERTIES)
-def nfd(c: str, _=None) -> str:
+def nfd(c: UniCode, _=None) -> str:
     return unicodedata.normalize('NFD', c)
 
 @register(PROPERTIES)
-def nfkd(c: str, _=None) -> str:
+def nfkd(c: UniCode, _=None) -> str:
     return unicodedata.normalize('NFKD', c)
 
 @register(PROPERTIES)
-def numeric(c: str, default: T | None = None) -> float | T | None:
+def numeric(c: UniCode, default: float | None = None) -> float | None:
     return unicodedata.numeric(c, default)
 
 @register(PROPERTIES)
-def ordinal(c: str, _=None) -> int:
+def ordinal(c: UniCode, _=None) -> int:
     return ord(c)
 
 @register(PROPERTIES)
-def u(c: str, _=None, digits: int = 4) -> str:
+def u(c: UniCode, _=None, digits: int = 4) -> str:
     return f'U+{ord(c):0{digits}X}'
 
 @register(PROPERTIES)
-def usv(c: str, replacement: T | None = None) -> str | T | None:
+def usv(c: UniCode, replacement: str | None = None) -> str | None:
     """Unicode Scalar Value."""
     if ord(c) in range(0xD800, 0xE000):
         return replacement
     return c
 
 @register(PROPERTIES)
-def utf8(c: str, _=None) -> Sequence[int]:
+def utf8(c: UniCode, _=None) -> Sequence[int]:
     return utf32to8(ord(c))
 
 @register(PROPERTIES)
-def utf16(c: str, _=None) -> Sequence[int]:
+def utf16(c: UniCode, _=None) -> Sequence[int]:
     return utf32to16(ord(c))
 
 @register(PROPERTIES)
-def width(c: str, _=None) -> str:
+def width(c: UniCode, _=None) -> str:
     return unicodedata.east_asian_width(c)
